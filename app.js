@@ -301,9 +301,12 @@ function toggleTheme() {
 
 /* ─── GUEST LOGIN (testing bypass) ───── */
 function guestLogin() {
-  document.getElementById('greeting-name').textContent = 'there';
-  document.getElementById('sb-name').textContent = 'Guest';
-  document.getElementById('sb-avatar').textContent = 'G';
+  const greeting = document.getElementById('greeting-name');
+  const sbName = document.getElementById('sb-name');
+  const sbAvatar = document.getElementById('sb-avatar');
+  if (greeting) greeting.textContent = 'there';
+  if (sbName) sbName.textContent = 'Guest';
+  if (sbAvatar) sbAvatar.textContent = 'G';
   const emailEl = document.getElementById('sb-email-display');
   if (emailEl) emailEl.textContent = 'guest mode';
   showScreen('app');
@@ -467,26 +470,39 @@ function pvMockSend() {
 /* ─── ROI CALCULATOR ─────────────────── */
 const PLANS = [{ name:'Weekly', cost:3.99 }, { name:'Monthly', cost:10 }, { name:'Lifetime', cost:100 }];
 function calcROI() {
-  const salary = parseInt(document.getElementById('roi-salary').value);
-  const bonus  = parseInt(document.getElementById('roi-bonus').value);
-  const years  = parseInt(document.getElementById('roi-years').value);
-  const planI  = parseInt(document.getElementById('roi-plan').value);
-  const plan   = PLANS[planI];
+  const salaryEl = document.getElementById('roi-salary');
+  const bonusEl  = document.getElementById('roi-bonus');
+  const yearsEl = document.getElementById('roi-years');
+  const planEl  = document.getElementById('roi-plan');
+  if (!salaryEl || !bonusEl || !yearsEl || !planEl) return;
 
-  document.getElementById('roi-salary-label').textContent = '$' + salary.toLocaleString();
-  document.getElementById('roi-bonus-label').textContent  = '$' + bonus.toLocaleString();
-  document.getElementById('roi-years-label').textContent  = years + (years === 1 ? ' year' : ' years');
-  document.getElementById('roi-plan-label').textContent   = plan.name;
+  const salary = parseInt(salaryEl.value) || 0;
+  const bonus  = parseInt(bonusEl.value) || 0;
+  const years  = parseInt(yearsEl.value) || 1;
+  const planI  = parseInt(planEl.value) || 0;
+  const plan   = PLANS[planI] || PLANS[0];
+
+  const salaryLabel = document.getElementById('roi-salary-label');
+  const bonusLabel = document.getElementById('roi-bonus-label');
+  const yearsLabel = document.getElementById('roi-years-label');
+  const planLabel = document.getElementById('roi-plan-label');
+  if (salaryLabel) salaryLabel.textContent = '$' + salary.toLocaleString();
+  if (bonusLabel) bonusLabel.textContent = '$' + bonus.toLocaleString();
+  if (yearsLabel) yearsLabel.textContent = years + (years === 1 ? ' year' : ' years');
+  if (planLabel) planLabel.textContent = plan.name;
 
   const totalEarn = salary * years + bonus;
-  const cost = plan.cost;
-  const multiple = Math.round(totalEarn / cost);
+  const cost = plan.cost || 1;
+  const multiple = cost ? Math.round(totalEarn / cost) : 0;
 
-  document.getElementById('roi-total-earn').textContent = '$' + totalEarn.toLocaleString();
-  document.getElementById('roi-cost').textContent = '$' + cost.toLocaleString();
-  document.getElementById('roi-multiple').textContent = multiple.toLocaleString() + '×';
-  document.getElementById('roi-sub').textContent =
-    'every $1 spent on Superday returns $' + Math.round(totalEarn / cost).toLocaleString() + ' in earnings';
+  const earnEl = document.getElementById('roi-total-earn');
+  const costEl = document.getElementById('roi-cost');
+  const multEl = document.getElementById('roi-multiple');
+  const subEl = document.getElementById('roi-sub');
+  if (earnEl) earnEl.textContent = '$' + totalEarn.toLocaleString();
+  if (costEl) costEl.textContent = '$' + cost.toLocaleString();
+  if (multEl) multEl.textContent = multiple.toLocaleString() + '×';
+  if (subEl) subEl.textContent = 'every $1 spent on Superday returns $' + (cost ? Math.round(totalEarn / cost).toLocaleString() : '0') + ' in earnings';
 }
 
 /* ─── FAQ ────────────────────────────── */
@@ -542,15 +558,25 @@ const DEMO_CARDS = [
 let demoFCIndex = 0, demoFCFlipped = false, demoFCOrder = [0,1,2,3,4];
 
 function demoFCRender() {
+  const catEl = document.getElementById('demo-fc-cat');
+  const qEl = document.getElementById('demo-fc-q');
+  if (!catEl || !qEl) return;
+
   const i = demoFCOrder[demoFCIndex];
   const c = DEMO_CARDS[i];
-  document.getElementById('demo-fc-cat').textContent = c.cat;
-  document.getElementById('demo-fc-q').textContent = c.q;
-  document.getElementById('demo-fc-a').textContent = c.a;
-  document.getElementById('demo-fc-tip').textContent = '💡 ' + c.tip;
+  if (!c) return;
+
+  catEl.textContent = c.cat;
+  qEl.textContent = c.q;
+  const aEl = document.getElementById('demo-fc-a');
+  const tipEl = document.getElementById('demo-fc-tip');
+  const labelEl = document.getElementById('demo-fc-label');
+  const progEl = document.getElementById('demo-fc-prog');
+  if (aEl) aEl.textContent = c.a;
+  if (tipEl) tipEl.textContent = '💡 ' + c.tip;
   const pct = Math.round((demoFCIndex / DEMO_CARDS.length) * 100);
-  document.getElementById('demo-fc-label').textContent = c.cat.split('—')[1]?.trim().toUpperCase() + ' · Card ' + (demoFCIndex+1) + ' of ' + DEMO_CARDS.length;
-  document.getElementById('demo-fc-prog').textContent = pct + '% complete';
+  if (labelEl) labelEl.textContent = c.cat.split('—')[1]?.trim().toUpperCase() + ' · Card ' + (demoFCIndex+1) + ' of ' + DEMO_CARDS.length;
+  if (progEl) progEl.textContent = pct + '% complete';
   // reset flip
   demoFCFlipped = false;
   const card = document.getElementById('demo-fc-card');
@@ -624,19 +650,25 @@ function showAuthTab(tab) {
 }
 
 function switchAuthTab(tab) {
-  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
-  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
-  document.getElementById('auth-login-form').style.display = tab === 'login' ? 'block' : 'none';
-  document.getElementById('auth-signup-form').style.display = tab === 'signup' ? 'block' : 'none';
+  const tabLogin = document.getElementById('tab-login');
+  const tabSignup = document.getElementById('tab-signup');
+  const loginForm = document.getElementById('auth-login-form');
+  const signupForm = document.getElementById('auth-signup-form');
+  if (tabLogin) tabLogin.classList.toggle('active', tab === 'login');
+  if (tabSignup) tabSignup.classList.toggle('active', tab === 'signup');
+  if (loginForm) loginForm.style.display = tab === 'login' ? 'block' : 'none';
+  if (signupForm) signupForm.style.display = tab === 'signup' ? 'block' : 'none';
 }
 
 async function doLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-password').value;
+  const emailEl = document.getElementById('login-email');
+  const passwordEl = document.getElementById('login-password');
+  const email = emailEl ? emailEl.value.trim() : '';
+  const password = passwordEl ? passwordEl.value : '';
   const btn = document.getElementById('login-btn');
   const msg = document.getElementById('login-msg');
-  msg.className = 'auth-msg'; msg.textContent = '';
-  if (!email || !password) { showMsg(msg, 'error', 'Please fill in all fields.'); return; }
+  if (msg) { msg.className = 'auth-msg'; msg.textContent = ''; }
+  if (!email || !password) { if (msg) showMsg(msg, 'error', 'Please fill in all fields.'); return; }
   btn.disabled = true; btn.textContent = 'Logging in…';
   const { data, error } = await sb.auth.signInWithPassword({ email, password });
   btn.disabled = false; btn.textContent = 'Log in →';
@@ -645,13 +677,16 @@ async function doLogin() {
 }
 
 async function doSignup() {
-  const name = document.getElementById('signup-name').value.trim();
-  const email = document.getElementById('signup-email').value.trim();
-  const password = document.getElementById('signup-password').value;
+  const nameEl = document.getElementById('signup-name');
+  const emailEl = document.getElementById('signup-email');
+  const passwordEl = document.getElementById('signup-password');
+  const name = nameEl ? nameEl.value.trim() : '';
+  const email = emailEl ? emailEl.value.trim() : '';
+  const password = passwordEl ? passwordEl.value : '';
   const btn = document.getElementById('signup-btn');
   const msg = document.getElementById('signup-msg');
-  msg.className = 'auth-msg'; msg.textContent = '';
-  if (!name || !email || !password) { showMsg(msg, 'error', 'Please fill in all fields.'); return; }
+  if (msg) { msg.className = 'auth-msg'; msg.textContent = ''; }
+  if (!name || !email || !password) { if (msg) showMsg(msg, 'error', 'Please fill in all fields.'); return; }
   if (password.length < 8) { showMsg(msg, 'error', 'Password must be at least 8 characters.'); return; }
   btn.disabled = true; btn.textContent = 'Creating account…';
   const { data, error } = await sb.auth.signUp({
@@ -681,11 +716,14 @@ function showMsg(el, type, text) {
 
 async function onSignedIn(user) {
   currentUser = user;
-  const name = user.user_metadata?.full_name || user.email.split('@')[0];
+  const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
   const cap = capitalize(name);
-  document.getElementById('greeting-name').textContent = cap;
-  document.getElementById('sb-name').textContent = cap;
-  document.getElementById('sb-avatar').textContent = cap[0].toUpperCase();
+  const greetingEl = document.getElementById('greeting-name');
+  const sbNameEl = document.getElementById('sb-name');
+  const sbAvatarEl = document.getElementById('sb-avatar');
+  if (greetingEl) greetingEl.textContent = cap;
+  if (sbNameEl) sbNameEl.textContent = cap;
+  if (sbAvatarEl) sbAvatarEl.textContent = cap[0].toUpperCase();
   const emailEl = document.getElementById('sb-email-display');
   if (emailEl) emailEl.textContent = user.email;
   await loadProgress();
@@ -725,7 +763,8 @@ async function loadProgress() {
   renderPrepPlan();
   
   if (progress.onrampComplete) {
-    document.getElementById('story-bank-btn').classList.add('show');
+    const btn = document.getElementById('story-bank-btn');
+    if (btn) btn.classList.add('show');
   }
   if (!progress.diagnosticDone) {
     setTimeout(checkFirstVisit, 500);
@@ -758,7 +797,9 @@ async function saveProgress() {
 /* ─── SCREENS ────────────────────────── */
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + id).classList.add('active');
+  const screen = document.getElementById('screen-' + id);
+  if (!screen) return;
+  screen.classList.add('active');
   if (id === 'app') {
     const d = new Date();
     const el = document.getElementById('dash-date');
@@ -769,7 +810,8 @@ function showScreen(id) {
 }
 
 function ctaSignup() {
-  const email = document.getElementById('cta-email').value.trim();
+  const ctaEmail = document.getElementById('cta-email');
+  const email = ctaEmail ? ctaEmail.value.trim() : '';
   if (email) {
     const signupEmail = document.getElementById('signup-email');
     if (signupEmail) signupEmail.value = email;
@@ -1463,8 +1505,10 @@ function startMock() {
   const badge = document.getElementById('iv-badge');
   if (badge) { badge.className = 'iv-badge badge-live'; badge.textContent = '● LIVE'; }
   mockHistory = [];
-  const cat = document.getElementById('mock-cat').value;
-  const firm = document.getElementById('mock-firm').value;
+  const catEl = document.getElementById('mock-cat');
+  const firmEl = document.getElementById('mock-firm');
+  const cat = catEl ? catEl.value : 'tech';
+  const firm = firmEl ? firmEl.value : 'Goldman Sachs';
   const chatBody = document.getElementById('chat-body');
   if (chatBody) chatBody.innerHTML = '';
   appendMsg('ai', 'Welcome. I\'m Alex Chen, VP in M&A at ' + firm + '. This is a technical interview — I\'ll ask you questions and score each answer. Ready? Let\'s start.');
@@ -1504,6 +1548,7 @@ function removeTyping() { document.getElementById('typing-indicator')?.remove();
 async function sendMsg() {
   if (!mockActive) return;
   const ta = document.getElementById('chat-input');
+  if (!ta) return;
   const text = ta.value.trim();
   if (!text) return;
   ta.value = ''; ta.style.height = 'auto';
@@ -1512,8 +1557,10 @@ async function sendMsg() {
   appendMsg('user', text);
   mockHistory.push({role:'user', content:text});
   showTyping();
-  const cat = document.getElementById('mock-cat').value;
-  const firm = document.getElementById('mock-firm').value;
+  const catEl = document.getElementById('mock-cat');
+  const firmEl = document.getElementById('mock-firm');
+  const cat = catEl ? catEl.value : 'tech';
+  const firm = firmEl ? firmEl.value : 'Goldman Sachs';
   try {
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method:"POST",
@@ -1563,9 +1610,12 @@ let quizAnswered = false;
 let quizMistakes = [];
 
 function startQuiz() {
-  const cat = document.getElementById('quiz-cat-select').value;
-  const countVal = document.getElementById('quiz-count-select').value;
-  const diff = document.getElementById('quiz-diff-select').value;
+  const catEl = document.getElementById('quiz-cat-select');
+  const countEl = document.getElementById('quiz-count-select');
+  const diffEl = document.getElementById('quiz-diff-select');
+  const cat = catEl ? catEl.value : 'all';
+  const countVal = countEl ? countEl.value : '10';
+  const diff = diffEl ? diffEl.value : 'all';
   
   // Filter questions that have MCQ options
   let pool = QUESTIONS.filter(q => q.wrong && q.wrong.length > 0);
@@ -1592,9 +1642,12 @@ function startQuiz() {
   quizMistakes = [];
   quizAnswered = false;
   
-  document.getElementById('quiz-setup').style.display = 'none';
-  document.getElementById('quiz-active').style.display = 'block';
-  document.getElementById('quiz-results').style.display = 'none';
+  const setupEl = document.getElementById('quiz-setup');
+  const activeEl = document.getElementById('quiz-active');
+  const resultsEl = document.getElementById('quiz-results');
+  if (setupEl) setupEl.style.display = 'none';
+  if (activeEl) activeEl.style.display = 'block';
+  if (resultsEl) resultsEl.style.display = 'none';
   
   renderQuizQuestion();
 }
@@ -1609,16 +1662,18 @@ function renderQuizQuestion() {
   quizAnswered = false;
   
   // Update progress
-  document.getElementById('quiz-progress-fill').style.width = ((quizIndex) / quizQuestions.length * 100) + '%';
-  document.getElementById('quiz-progress-text').textContent = (quizIndex + 1) + ' / ' + quizQuestions.length;
+  const progressFill = document.getElementById('quiz-progress-fill');
+  const progressText = document.getElementById('quiz-progress-text');
+  if (progressFill) progressFill.style.width = ((quizIndex) / quizQuestions.length * 100) + '%';
+  if (progressText) progressText.textContent = (quizIndex + 1) + ' / ' + quizQuestions.length;
   
   // Category label
   const catLabels = {tech: 'TECHNICAL', beh: 'BEHAVIORAL', deal: 'DEALS & MARKETS', brain: 'BRAIN TEASER'};
   const subLabels = {accounting: ' — ACCOUNTING', valuation: ' — VALUATION', lbo: ' — LBO', ma: ' — M&A'};
-  document.getElementById('quiz-current-cat').textContent = (catLabels[q.cat] || 'TECHNICAL') + (subLabels[q.sub] || '');
-  
-  // Question
-  document.getElementById('quiz-current-question').textContent = q.q;
+  const currentCat = document.getElementById('quiz-current-cat');
+  const currentQ = document.getElementById('quiz-current-question');
+  if (currentCat) currentCat.textContent = (catLabels[q.cat] || 'TECHNICAL') + (subLabels[q.sub] || '');
+  if (currentQ) currentQ.textContent = q.q;
   
   // Shuffle answers
   const answers = [
@@ -1634,7 +1689,8 @@ function renderQuizQuestion() {
   }
   
   const letters = ['A', 'B', 'C', 'D'];
-  document.getElementById('quiz-answers').innerHTML = answers.map((a, i) => 
+  const answersEl = document.getElementById('quiz-answers');
+  if (answersEl) answersEl.innerHTML = answers.map((a, i) => 
     `<div class="quiz-answer" data-correct="${a.correct}" onclick="selectQuizAnswer(this)">
       <span class="quiz-letter">${letters[i]}</span>
       <span>${a.text}</span>
@@ -1642,8 +1698,10 @@ function renderQuizQuestion() {
   ).join('');
   
   // Hide feedback and actions
-  document.getElementById('quiz-feedback').className = 'quiz-feedback';
-  document.getElementById('quiz-actions').style.display = 'none';
+  const feedbackEl = document.getElementById('quiz-feedback');
+  const actionsEl = document.getElementById('quiz-actions');
+  if (feedbackEl) feedbackEl.className = 'quiz-feedback';
+  if (actionsEl) actionsEl.style.display = 'none';
 }
 
 function selectQuizAnswer(el) {
@@ -1674,14 +1732,17 @@ function selectQuizAnswer(el) {
   
   // Show feedback
   const feedback = document.getElementById('quiz-feedback');
-  feedback.className = 'quiz-feedback show ' + (isCorrect ? 'correct' : 'incorrect');
-  feedback.innerHTML = `
+  if (feedback) {
+    feedback.className = 'quiz-feedback show ' + (isCorrect ? 'correct' : 'incorrect');
+    feedback.innerHTML = `
     <div class="quiz-feedback-title">${isCorrect ? '✓ Correct!' : '✗ Incorrect'}</div>
     <div class="quiz-feedback-text">${isCorrect ? '' : '<strong>Correct answer:</strong> ' + q.a}</div>
   `;
+  }
   
   // Show next button
-  document.getElementById('quiz-actions').style.display = 'flex';
+  const actionsEl = document.getElementById('quiz-actions');
+  if (actionsEl) actionsEl.style.display = 'flex';
 }
 
 function rateCardById(id, rating) {
@@ -1706,23 +1767,32 @@ function nextQuizQuestion() {
 }
 
 function showQuizResults() {
-  document.getElementById('quiz-active').style.display = 'none';
-  document.getElementById('quiz-results').style.display = 'block';
+  const activeEl = document.getElementById('quiz-active');
+  const resultsEl = document.getElementById('quiz-results');
+  if (activeEl) activeEl.style.display = 'none';
+  if (resultsEl) resultsEl.style.display = 'block';
   
-  const pct = Math.round(quizCorrect / quizQuestions.length * 100);
-  document.getElementById('quiz-final-score').textContent = pct + '%';
-  document.getElementById('quiz-correct-count').textContent = quizCorrect;
-  document.getElementById('quiz-incorrect-count').textContent = quizQuestions.length - quizCorrect;
-  document.getElementById('quiz-total-count').textContent = quizQuestions.length;
+  const pct = quizQuestions.length ? Math.round(quizCorrect / quizQuestions.length * 100) : 0;
+  const scoreEl = document.getElementById('quiz-final-score');
+  const correctEl = document.getElementById('quiz-correct-count');
+  const incorrectEl = document.getElementById('quiz-incorrect-count');
+  const totalEl = document.getElementById('quiz-total-count');
+  if (scoreEl) scoreEl.textContent = pct + '%';
+  if (correctEl) correctEl.textContent = quizCorrect;
+  if (incorrectEl) incorrectEl.textContent = quizQuestions.length - quizCorrect;
+  if (totalEl) totalEl.textContent = quizQuestions.length;
   
   updateMasteryStats();
   updateDashStats();
 }
 
 function showQuizSetup() {
-  document.getElementById('quiz-setup').style.display = 'block';
-  document.getElementById('quiz-active').style.display = 'none';
-  document.getElementById('quiz-results').style.display = 'none';
+  const setupEl = document.getElementById('quiz-setup');
+  const activeEl = document.getElementById('quiz-active');
+  const resultsEl = document.getElementById('quiz-results');
+  if (setupEl) setupEl.style.display = 'block';
+  if (activeEl) activeEl.style.display = 'none';
+  if (resultsEl) resultsEl.style.display = 'none';
 }
 
 function reviewQuizMistakes() {
@@ -3233,28 +3303,38 @@ function updateDeadlineCountdown() {
 
 /* ─── INIT ───────────────────────────── */
 window.addEventListener('DOMContentLoaded', async function() {
-  const d = new Date();
-  const el = document.getElementById('dash-date');
-  if (el) el.textContent = d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-  updateDashStats();
-  updateDeadlineCountdown();
-  calcROI();
-  demoFCRender();
-
-  // Restore existing session
-  const { data: { session } } = await sb.auth.getSession();
-  if (session?.user) {
-    await onSignedIn(session.user);
+  try {
+    const d = new Date();
+    const el = document.getElementById('dash-date');
+    if (el) el.textContent = d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+    updateDashStats();
+    updateDeadlineCountdown();
+    calcROI();
+    demoFCRender();
+  } catch (e) {
+    console.error('Init error:', e);
   }
 
-  // Listen for auth changes
-  sb.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session?.user) {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session?.user) {
       await onSignedIn(session.user);
-    } else if (event === 'SIGNED_OUT') {
-      showScreen('landing');
     }
-  });
+  } catch (e) {
+    console.error('Auth session restore error:', e);
+  }
+
+  try {
+    sb.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        try { await onSignedIn(session.user); } catch (e) { console.error('onSignedIn error:', e); }
+      } else if (event === 'SIGNED_OUT') {
+        showScreen('landing');
+      }
+    });
+  } catch (e) {
+    console.error('Auth listener error:', e);
+  }
 });
 
 /* ─── PROFILE ────────────────────────── */
@@ -3300,13 +3380,13 @@ function toggleProfileEdit(section) {
     const emailInput = document.getElementById('profile-email');
     const actions = document.getElementById('profile-actions-info');
     const btn = document.getElementById('profile-edit-info-btn');
-    if (profileEditing.info) {
+    if (profileEditing.info && nameInput && emailInput && actions && btn) {
       nameInput.disabled = false;
       emailInput.disabled = false;
       actions.style.display = 'flex';
       btn.textContent = 'Cancel';
       nameInput.focus();
-    } else {
+    } else if (!profileEditing.info) {
       renderProfile();
     }
     clearProfileMsg('info');
@@ -3315,15 +3395,17 @@ function toggleProfileEdit(section) {
     const actions = document.getElementById('profile-actions-pw');
     const placeholder = document.getElementById('profile-pw-placeholder');
     const btn = document.getElementById('profile-edit-pw-btn');
-    if (profileEditing.pw) {
+    const pwNew = document.getElementById('profile-pw-new');
+    const pwConfirm = document.getElementById('profile-pw-confirm');
+    if (profileEditing.pw && formPw && actions && placeholder && btn) {
       formPw.style.display = 'flex';
       actions.style.display = 'flex';
       placeholder.style.display = 'none';
       btn.textContent = 'Cancel';
-      document.getElementById('profile-pw-new').value = '';
-      document.getElementById('profile-pw-confirm').value = '';
-      document.getElementById('profile-pw-new').focus();
-    } else {
+      if (pwNew) pwNew.value = '';
+      if (pwConfirm) pwConfirm.value = '';
+      if (pwNew) pwNew.focus();
+    } else if (!profileEditing.pw) {
       renderProfile();
     }
     clearProfileMsg('pw');
@@ -3346,9 +3428,12 @@ async function saveProfileInfo() {
 
     // Update UI everywhere
     const cap = capitalize(nameVal);
-    document.getElementById('greeting-name').textContent = cap;
-    document.getElementById('sb-name').textContent = cap;
-    document.getElementById('sb-avatar').textContent = cap[0].toUpperCase();
+    const g = document.getElementById('greeting-name');
+    const n = document.getElementById('sb-name');
+    const a = document.getElementById('sb-avatar');
+    if (g) g.textContent = cap;
+    if (n) n.textContent = cap;
+    if (a) a.textContent = cap[0].toUpperCase();
     const sidebarEmail = document.getElementById('sb-email-display');
     if (sidebarEmail) sidebarEmail.textContent = emailVal;
 
@@ -3422,7 +3507,6 @@ let applyTypeFilter = 'all';
 let applySortField = 'deadline';
 let applySortDir = 1;
 let applySaved = [];
-try { let applySaved = [];
 
 function setApplyFilter(f, el) {
   applyFilter = f;
@@ -3445,7 +3529,7 @@ function toggleApplySave(firm) {
   const idx = applySaved.indexOf(firm);
   if (idx >= 0) applySaved.splice(idx, 1);
   else applySaved.push(firm);
-  try { saveProgress();
+  try { saveProgress(); } catch(e) {}
   renderApplyTracker();
 }
 
