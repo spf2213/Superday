@@ -4,7 +4,6 @@ import { LEARN_MODULES } from './src/data/learnModules.js';
 import { INTERNSHIP_DATA } from './src/data/internships.js';
 import { setNavActive, toggleTheme } from './src/theme.js';
 import { renderKnowledgeMap, mapZoom, mapFitAll, mapResetView, setMapDeps } from './src/map.js';
-import { renderCasesGrid, startCase, showCaseHints, checkCaseAnswers, closeCase, setCasesDeps } from './src/cases.js';
 import { renderApplyTracker, setApplyFilter, setApplyType, sortApply, toggleApplySave, getApplySaved, setApplySaved, setInternshipsDeps } from './src/internships.js';
 import './src/animations.js';
 /* ─── GUEST LOGIN (testing bypass) ───── */
@@ -553,7 +552,7 @@ function showView(id) {
   document.querySelectorAll('.sb-item').forEach(n => n.classList.remove('active'));
   const view = document.getElementById('view-' + id);
   if (view) view.classList.add('active');
-  const labels = {dashboard:'Dashboard',bank:'Question Bank',flash:'Flashcards',mock:'Mock Interview',quiz:'Quiz Mode',map:'Knowledge Map',learn:'Concepts',cases:'Mini-Cases',apply:'Internship Tracker',profile:'Profile'};
+  const labels = {dashboard:'Dashboard',bank:'Question Bank',flash:'Flashcards',mock:'Mock Interview',quiz:'Quiz Mode',map:'Knowledge Map',learn:'Concepts',apply:'Internship Tracker',profile:'Profile'};
   document.querySelectorAll('.sb-item').forEach(n => {
     if (n.textContent.trim().toLowerCase().includes((labels[id]||id).toLowerCase()))
       n.classList.add('active');
@@ -563,7 +562,6 @@ function showView(id) {
   if (id === 'map') renderKnowledgeMap();
   if (id === 'quiz') showQuizSetup();
   if (id === 'learn') renderLearnModules();
-  if (id === 'cases') renderCasesGrid();
   if (id === 'apply') renderApplyTracker();
   if (id === 'profile') renderProfile();
 }
@@ -2369,14 +2367,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 /* ─── WIRE MODULE DEPENDENCIES ──────── */
 setMapDeps({ getMasteryClass, showView });
-setCasesDeps({ progress, saveProgress });
 setInternshipsDeps({ saveProgress });
 
 /* ─── EXPOSE GLOBALS FOR INLINE HANDLERS ─── */
 // Temporary: needed because index.html uses onclick="fn()" attributes.
 // These will be removed when we migrate to addEventListener.
 Object.assign(window, {
-  addNewStory, calcROI, checkCaseAnswers, closeCase, closeDiagnostic,
+  addNewStory, calcROI, closeDiagnostic,
   closeDiagnosticToLanding, closeLearnModule, completeOnramp, demoChatSend,
   demoFilterBank, demoFlipCard, demoFCNav, demoFCShuffle, demoToggleQ,
   doLogin, doSignOut, doSignup, filterBank, filterBankNav, filterSub,
@@ -2387,9 +2384,9 @@ Object.assign(window, {
   renderApplyTracker, renderBank, reviewQuizMistakes, saveProfileInfo,
   saveProfilePassword, selectDiagAnswer, selectOnramp, selectQuizAnswer,
   sendMsg, setApplyFilter, setApplyType, setFlashCat, setNavActive,
-  setStudyMode, showAuthTab, showCaseHints, showOnramp, showQuizSetup,
+  setStudyMode, showAuthTab, showOnramp, showQuizSetup,
   showScreen, showView, shuffleFlash, skipDiagnostic, smartPractice,
-  sortApply, startCase, startDiagnostic, startDirectDiagnostic, startMock,
+  sortApply, startDiagnostic, startDirectDiagnostic, startMock,
   startQuiz, switchAuthTab, toggleApplySave, toggleFaq, toggleOnrampMulti,
   togglePrepTask, toggleProfileEdit, toggleQ, toggleStoryPanel, toggleTheme,
   viewStoryNote
