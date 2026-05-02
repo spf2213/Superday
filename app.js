@@ -1,10 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { QUESTIONS } from './src/data/questions.js';
 import { LEARN_MODULES } from './src/data/learnModules.js';
-import { INTERNSHIP_DATA } from './src/data/internships.js';
 import { setNavActive, toggleTheme } from './src/theme.js';
 import { renderKnowledgeMap, mapZoom, mapFitAll, mapResetView, setMapDeps } from './src/map.js';
-import { renderApplyTracker, setApplyFilter, setApplyType, sortApply, toggleApplySave, getApplySaved, setApplySaved, setInternshipsDeps } from './src/internships.js';
 import './src/animations.js';
 /* ─── GUEST LOGIN (testing bypass) ───── */
 function guestLogin() {
@@ -480,7 +478,6 @@ async function loadProgress() {
       progress.completedTasks = data.completed_tasks || [];
       progress.learnProgress = data.learn_progress || {};
       progress.completedCases = data.completed_cases || [];
-      setApplySaved(data.saved_firms || []);
     }
   } catch(e) { console.error('loadProgress error:', e); }
   updateDashStats();
@@ -513,8 +510,7 @@ async function saveProgress() {
       question_notes: progress.questionNotes || {},
       completed_tasks: progress.completedTasks || [],
       learn_progress: progress.learnProgress || {},
-      completed_cases: progress.completedCases || [],
-      saved_firms: getApplySaved() || []
+      completed_cases: progress.completedCases || []
     }, { onConflict: 'user_id' });
   } catch(e) { console.error('saveProgress error:', e); }
 }
@@ -552,7 +548,7 @@ function showView(id) {
   document.querySelectorAll('.sb-item').forEach(n => n.classList.remove('active'));
   const view = document.getElementById('view-' + id);
   if (view) view.classList.add('active');
-  const labels = {dashboard:'Dashboard',bank:'Question Bank',flash:'Flashcards',mock:'Mock Interview',quiz:'Quiz Mode',map:'Knowledge Map',learn:'Concepts',apply:'Internship Tracker',profile:'Profile'};
+  const labels = {dashboard:'Dashboard',bank:'Question Bank',flash:'Flashcards',mock:'Mock Interview',quiz:'Quiz Mode',map:'Knowledge Map',learn:'Concepts',profile:'Profile'};
   document.querySelectorAll('.sb-item').forEach(n => {
     if (n.textContent.trim().toLowerCase().includes((labels[id]||id).toLowerCase()))
       n.classList.add('active');
@@ -562,7 +558,6 @@ function showView(id) {
   if (id === 'map') renderKnowledgeMap();
   if (id === 'quiz') showQuizSetup();
   if (id === 'learn') renderLearnModules();
-  if (id === 'apply') renderApplyTracker();
   if (id === 'profile') renderProfile();
 }
 
@@ -730,70 +725,6 @@ function updateDashStats() {
     if (ce) ce.textContent = n + ' of ' + pool.length + ' answered';
   });
   renderActivity();
-  renderDashPipeline();
-}
-
-function renderDashPipeline() {
-  const el = document.getElementById('dash-pipeline');
-  if (!el || typeof INTERNSHIP_DATA === 'undefined') return;
-  
-  const today = new Date();
-  const open = INTERNSHIP_DATA.filter(d => d.status === 'open');
-  const upcoming = INTERNSHIP_DATA.filter(d => d.status === 'upcoming');
-  const closed = INTERNSHIP_DATA.filter(d => d.status === 'closed');
-  
-  // Find urgently closing (within 14 days) sorted soonest first
-  const closing = open
-    .map(d => ({ ...d, daysLeft: Math.ceil((new Date(d.deadline) - today) / (1000*60*60*24)) }))
-    .filter(d => d.daysLeft >= 0 && d.daysLeft <= 21)
-    .sort((a, b) => a.daysLeft - b.daysLeft)
-    .slice(0, 4);
-  
-  const savedCount = getApplySaved().length;
-  
-  let urgentRows = '';
-  if (closing.length) {
-    urgentRows = closing.map(d => {
-      const dlClass = d.daysLeft <= 7 ? 'urgent' : 'soon';
-      const dlText = d.daysLeft === 0 ? 'Today' : d.daysLeft === 1 ? '1 day left' : d.daysLeft + ' days left';
-      return '<div class="pipeline-urgent-row" onclick="showView(\'apply\')">' +
-        '<div class="pipeline-urgent-logo">' + d.abbr.substring(0,3) + '</div>' +
-        '<div class="pipeline-urgent-info">' +
-          '<div class="pipeline-urgent-firm">' + d.firm + '</div>' +
-          '<div class="pipeline-urgent-div">' + d.division + '</div>' +
-        '</div>' +
-        '<span class="pipeline-urgent-deadline ' + dlClass + '">' + dlText + '</span>' +
-        '<a class="pipeline-urgent-apply" href="' + d.url + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">Apply</a>' +
-      '</div>';
-    }).join('');
-  } else {
-    urgentRows = '<div class="pipeline-empty">No urgent deadlines right now — you\'re ahead of the curve.</div>';
-  }
-  
-  el.innerHTML = `
-    <div class="pipeline-header">
-      <span class="pipeline-title">⊞ Application Pipeline <span class="pipeline-badge" style="background:var(--accent-dim);color:var(--accent)">SUMMER 2027</span></span>
-      <span class="dp-action" onclick="showView('apply')">Full tracker →</span>
-    </div>
-    <div class="pipeline-summary">
-      <div class="pipeline-summary-item" onclick="showView('apply')">
-        <div class="pipeline-summary-val" style="color:var(--green)">${open.length}</div>
-        <div class="pipeline-summary-label">Open now</div>
-      </div>
-      <div class="pipeline-summary-item" onclick="showView('apply')">
-        <div class="pipeline-summary-val" style="color:var(--amber)">${upcoming.length}</div>
-        <div class="pipeline-summary-label">Upcoming</div>
-      </div>
-      <div class="pipeline-summary-item" onclick="showView('apply')">
-        <div class="pipeline-summary-val">${savedCount}</div>
-        <div class="pipeline-summary-label">Saved</div>
-      </div>
-    </div>
-    ${closing.length ? '<div style="padding:6px 16px 2px;font-size:10px;color:var(--t-3);font-family:\'Geist Mono\',monospace;letter-spacing:0.06em;text-transform:uppercase">Closing soon</div>' : ''}
-    <div class="pipeline-urgents">
-      ${urgentRows}
-    </div>
-  `;
 }
 
 function smartPractice() {
@@ -2351,7 +2282,6 @@ function clearProfileMsg(section) {
 /* ─── INIT ───────────────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
   if (typeof calcROI === 'function') calcROI();
-  if (typeof renderApplyTracker === 'function') renderApplyTracker();
   if (typeof demoFCRender === 'function') demoFCRender();
 
   // Nav scroll shadow
@@ -2367,7 +2297,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 /* ─── WIRE MODULE DEPENDENCIES ──────── */
 setMapDeps({ getMasteryClass, showView });
-setInternshipsDeps({ saveProgress });
 
 /* ─── EXPOSE GLOBALS FOR INLINE HANDLERS ─── */
 // Temporary: needed because index.html uses onclick="fn()" attributes.
@@ -2381,13 +2310,13 @@ Object.assign(window, {
   navScrollTo, nextCard, nextLearnSection, nextOnrampStep, nextQuizQuestion,
   openLearnModule, prevCard, prevLearnSection, prevOnrampStep, prevNav,
   pvBankFilter, pvFlipCard, pvFCNav, pvMockSend, pvToggleQ, rateCard,
-  renderApplyTracker, renderBank, reviewQuizMistakes, saveProfileInfo,
+  renderBank, reviewQuizMistakes, saveProfileInfo,
   saveProfilePassword, selectDiagAnswer, selectOnramp, selectQuizAnswer,
-  sendMsg, setApplyFilter, setApplyType, setFlashCat, setNavActive,
+  sendMsg, setFlashCat, setNavActive,
   setStudyMode, showAuthTab, showOnramp, showQuizSetup,
   showScreen, showView, shuffleFlash, skipDiagnostic, smartPractice,
-  sortApply, startDiagnostic, startDirectDiagnostic, startMock,
-  startQuiz, switchAuthTab, toggleApplySave, toggleFaq, toggleOnrampMulti,
+  startDiagnostic, startDirectDiagnostic, startMock,
+  startQuiz, switchAuthTab, toggleFaq, toggleOnrampMulti,
   togglePrepTask, toggleProfileEdit, toggleQ, toggleStoryPanel, toggleTheme,
   viewStoryNote
 });

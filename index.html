@@ -564,7 +564,7 @@
         <div data-reveal="left" data-dur="slow">
           <div class="feat-tag">Built-In Interviewer</div>
           <h2 class="feat-h">Practice with an AI that scores like a VP.</h2>
-          <p class="feat-p">Mock interviews with real-time scoring across three dimensions. An internship tracker to manage your pipeline. Firm-specific prep so you walk in ready for that bank, not just any bank.</p>
+          <p class="feat-p">Mock interviews with real-time scoring across three dimensions. Firm-specific prep so you walk in ready for that bank, not just any bank.</p>
           <button class="btn-primary" onclick="showAuthTab('signup')">Try a mock interview →</button>
         </div>
         <div class="demo-card" data-reveal="right" data-dur="slow" style="display:flex;flex-direction:column">
@@ -863,8 +863,6 @@
       <div class="sb-item" onclick="showView('flash')"><span class="sb-icon">⬡</span>Flashcards</div>
       <div class="sb-section">Test</div>
       <div class="sb-item" onclick="showView('mock')"><span class="sb-icon">◎</span>Mock Interview</div>
-      <div class="sb-section">Apply</div>
-      <div class="sb-item" onclick="showView('apply')"><span class="sb-icon">→</span>Internship Tracker</div>
     </div>
     <div class="sb-spacer"></div>
     <div class="sb-bottom">
@@ -929,7 +927,7 @@
       <!-- Personalized Prep Plan -->
       <div id="prep-plan-container"></div>
 
-      <!-- Two-column: left = study progress, right = application pipeline -->
+      <!-- Two-column: left = study progress, right = market news -->
       <div class="dash-two-col">
 
         <!-- LEFT: Study Progress -->
@@ -1060,10 +1058,8 @@
           </div>
         </div>
 
-        <!-- RIGHT: Application Pipeline + Market News -->
+        <!-- RIGHT: Market News -->
         <div class="dash-col-right">
-          <div class="dash-pipeline" id="dash-pipeline"></div>
-
           <div class="news-panel" id="news-panel">
             <div class="dp-header">
               <span class="dp-title">Market Pulse</span>
@@ -1424,56 +1420,6 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- ── INTERNSHIP TRACKER (APPLY) ── -->
-    <div class="app-view" id="view-apply">
-      <div class="view-header">
-        <div class="view-title">Internship Tracker</div>
-        <div class="view-sub">Summer 2027 IB internship deadlines. Track, filter, and never miss an application.</div>
-      </div>
-
-      <!-- Stats strip -->
-      <div class="apply-stats" id="apply-stats"></div>
-
-      <!-- Toolbar -->
-      <div class="apply-toolbar">
-        <input type="text" class="bank-search" id="apply-search" placeholder="Search firms…" oninput="renderApplyTracker()"/>
-        <div class="apply-filters" id="apply-filters">
-          <button class="bank-pill active" data-filter="all" onclick="setApplyFilter('all',this)">All</button>
-          <button class="bank-pill" data-filter="open" onclick="setApplyFilter('open',this)">Open</button>
-          <button class="bank-pill" data-filter="closed" onclick="setApplyFilter('closed',this)">Closed</button>
-          <button class="bank-pill" data-filter="upcoming" onclick="setApplyFilter('upcoming',this)">Upcoming</button>
-          <button class="bank-pill" data-filter="saved" onclick="setApplyFilter('saved',this)">★ Saved</button>
-        </div>
-        <div class="apply-type-filters" id="apply-type-filters">
-          <button class="bank-pill active" data-type="all" onclick="setApplyType('all',this)">All Types</button>
-          <button class="bank-pill" data-type="BB" onclick="setApplyType('BB',this)">Bulge Bracket</button>
-          <button class="bank-pill" data-type="EB" onclick="setApplyType('EB',this)">Elite Boutique</button>
-          <button class="bank-pill" data-type="MM" onclick="setApplyType('MM',this)">Middle Market</button>
-          <button class="bank-pill" data-type="Other" onclick="setApplyType('Other',this)">Other</button>
-        </div>
-      </div>
-
-      <!-- Table -->
-      <div class="apply-table-wrap">
-        <table class="apply-table">
-          <thead>
-            <tr>
-              <th class="apply-th-star"></th>
-              <th class="apply-th-sortable" onclick="sortApply('firm')">Firm <span class="apply-sort-icon">↕</span></th>
-              <th>Division</th>
-              <th>Type</th>
-              <th class="apply-th-sortable" onclick="sortApply('status')">Status <span class="apply-sort-icon">↕</span></th>
-              <th class="apply-th-sortable" onclick="sortApply('deadline')">Deadline <span class="apply-sort-icon">↕</span></th>
-              <th>Location</th>
-              <th>Link</th>
-            </tr>
-          </thead>
-          <tbody id="apply-tbody"></tbody>
-        </table>
-      </div>
-      <div class="apply-footer" id="apply-footer"></div>
     </div>
 
     <!-- ── MOCK INTERVIEW ── -->
